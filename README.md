@@ -1,121 +1,51 @@
 # Cards Application
+## BackEnd 
+###Calculations
 
-## Problem statement
 
-A bank wants to launch 2 new credit card products, C1 and C2. To receive applications for the products the bank will collect the following detail about the _applicant_ in a web-form or mobile app, which the bank provides:
 
-1. Name
-2. Address
-3. Email id
+- Considering 1 request will take 10 seconds to process in synchronous manner as suggested in the 
+  test description.
+- Now, How our TL service responds to these requests depends highly on the hardware, servers etc
+  where the service is deployed. So considering server as Tomcat we can serve 200 requests per given second (with default number of threads).
+  So, we might need to have few pods of this service available.
+  1 tomcat can serve 200 requests / sec and for processing 1M request in first hour we need
+  to process 1000000/(60*60)= 278 requests/second. And each of these requests could take upto
+  10 seconds to receive a response. So lets say we have a strong Hardware , with 278 threads
+  configured for Tomcat. We need minimum 10-11 such servers to be able to process this volume.
+- We can orchestrate all these deployment pods with Kubernetes or maybe adding auto scaling groups.
+- We have resolved the database bottleneck using Async service and Queue Message Brokers (RabbitMQ/Kafka).
+  So, user won't have to wait until data is transferred to Queue and then persisted to DB using listeners.
+- Using NoSQL to store the data due it's availability , scalability and the fact that we don't need
+  any ACID properties or relation between tables.
 
-The submission of this form will be received by a Tradeledger API and sent over to a Thirdparty service for eligibility decisioning. The Thirdparty provides a RESTful api which responds with one of the following eligibilities:
+### Backend Architecture
 
-1. C1
-2. C2
-3. Both C1 and C2
-4. Neither C1 nor C2
+![image info](./server/cards/tl-api/TL-API-Architecture.png)
 
-The Tradeledger APIs should interface with the Thirdparty, sending an eligibility request and updating the user with the result of their application.
 
-## Exercise Overview
+### Handled Edge Cases
+  1. Error handling when third party api is down
+  2. input validation - mandatory fields
 
-### FE
+### Test Coverage - BE
 
-1. Create React App (CRA)
+![image info](./server/cards/tl-api/BETestCoverage.png)
 
-### BE
+## FrontEnd
 
-1. A Microservices with Spring Boot (2.2.3.RELEASE+)
-2. Build Automation Tool - Gradle (6.0.1+)
+1. Added Field level validations on the page.
+2. Upon submit response will be displayed i.e. number of cards or info message.
+3. In case the third party api is down user will be given a message saying that "Oops! There have been an issue connecting to the servers , 
+   Please try in a while".
+4. Used Redux for state management.
+5. Added back button functionality from results page.
 
-## Completing the exercise
-
-### Submission
-
-1. Fork the repo to your own repository or setup provided _.zip_ project into your own repository.
-2. Complete the exercise.
-3. Please provide a link to your public repo with the completed task to the Talent Acquisition team.
-
-### Duration
-
-You should spend around ~1.5hrs on this task. You may spend longer if you wish, but ensure you think about which are the most critical pieces to complete first.
-
-## How to Run
-
-Open the project with IntelliJ or Eclipse or any other IDE of your choice
-
-### FE
-1. Go To terminal.
-2. cd client/cards -- Browse to Directory i.e. client/cards
-3. npm i -- to install the app
-4. npm test -- to test the app
-5. npm start -- to run the app
-
-### BE
-1. Go To terminal.
-2. cd server/cards --- Browse to Directory i.e. server/cards
-3. ./gradlew build -- to build the solution and third party
-4. ./gradlew test -- to unit/integration test the solution and third party
-5. ./gradlew bootRun -- to run the solution and third party applications simultaneously
-6. ./gradlew clean -- to clean the solution and third party
-
-or alternatively you can use IDE's builtin plugin for Gradle for these Gradle goals
-
-_Note: Gradle version should be 6.0.1+_
-
-## Task
-
-1. For BE, in /server, build a synchronous Tradeledger API to orchestrate the journey from the application submission to retrieval of response. The API should call the provided Thirdparty endpoint over HTTP.
-2. For FE, in /client, implement a call to the API you've just built and display the results using the provided components.
-
-## Stub structure
-
-### FE
-Within `/client/cards` the FE application is a simple CRA. You are provided with a simple form with inputs for name, email and address. You are required to implement the code to call the BE service and display the result. 
-Feel free to include any additional packages to implement, test and style the application.
-
-### BE
-BE stub is provided in `/server/cards/tl-api`, this is setup to run a spring bootrun service on `localhost:8080`. 
-There is also the third party service which is setup as a separate subproject within gradle in `/server/cards/thirdparty`, 
-this exposes a third party service endpoint on `localhost:3317`.
-
-The structure of the `com.tradeledger.cards` structure is just a suggestion, feel free to modify or structure
-as you think is logical, makes sense and extendable in the future.
-
-### Thirdparty contract:
-
-_Request_
-
-```
-POST /eligibility/check
-```
-
-```json
-{
-  "name": "String",
-  "email": "String",
-  "address": "String"
-}
-```
-
-_Response_
-
-```json
-{
-  "eligibleCards": "Array of C1, C2, BOTH or None"
-}
-```
-
-## Considerations (only for Solution Design section):
-
-1. The bank believes that the products would be extremely popular and around 1 million requests will be received in the first hour, tailing off from there
-2. The Thirdparty might take up to 10secs to respond to the request
-3. The processed applications and results need to be stored for up to 7 years for audit purposes
-
-## Assessment Criteria
-
-When assessing your completed solution we will be considering the follow 3 aspects:
-
-1. Correctness - how correct the solution is and that it is working
-2. Testability - how testable solution is, and the type + level of testing
-3. Code structure - how well-structured the solution is with considerations of extensibility in future and that it is clearly understandable
+###Further Improvements
+I would have done below if I had more time and more knowledge on TypeScript
+1. Routing (Like if user provides /result url directly , we redirect them back to Form page) 
+2. Styling specially result page
+3. Refresh page issue on result page.
+4. UI tests (I couldn't complete this because I haven't really used typescript before, I mostly have used
+   react JS ). So everything that I updated 
+was just by learning , with redux added testing became more complicated and time-consuming.

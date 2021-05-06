@@ -35,7 +35,7 @@ public class QueueServiceImpl implements QueueService {
         try {
             //Push message to a queue - Queue settings Rabbit/Kafka - then this could be
             //used by listeners to persist the data into DB
-            Thread.sleep(10);
+            Thread.sleep(50);
             log.info("message queued {} ", queueMessage);
         } catch (Exception e) {
             log.error("Error {} , queueMessage {} ", e, queueMessage);
