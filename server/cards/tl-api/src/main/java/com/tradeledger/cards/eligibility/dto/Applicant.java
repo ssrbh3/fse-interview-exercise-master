@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @ToString
-public final class Applicant {
+public  class Applicant {
 
 	@NotNull
 	private String name;
