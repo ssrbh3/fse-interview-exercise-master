@@ -9,7 +9,7 @@
 - Now, How our TL service responds to these requests depends highly on the hardware, servers etc
   where the service is deployed. So considering server as Tomcat we can serve 200 requests per given second (with default number of threads).
   So, we might need to have few pods of this service available.
-  1 tomcat can serve 200 requests / sec and for processing 1M request in first hour we need
+  1 tomcat (just for simlicity, a kubernestes pod will ofc have diff capabilities) can serve 200 requests / sec and for processing 1M request in first hour we need
   to process 1000000/(60*60)= 278 requests/second. And each of these requests could take upto
   10 seconds to receive a response. So lets say we have a strong Hardware , with 278 threads
   configured for Tomcat. We need minimum 10-11 such servers to be able to process this volume.
